@@ -1,19 +1,19 @@
 import { Box, Container, Heading, Text, VStack, Button } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEvent } from "../integrations/supabase/index.js";
 
 const EventDetails = () => {
   const { id } = useParams();
-  const [event, setEvent] = useState(null);
+  const { data: event, isLoading } = useEvent(id);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const events = JSON.parse(localStorage.getItem("events")) || [];
-    const event = events[id];
-    if (event) {
-      setEvent(event);
-    }
-  }, [id]);
+  if (isLoading) {
+    return (
+      <Container maxW="container.md" p={4}>
+        <Text>Loading...</Text>
+      </Container>
+    );
+  }
 
   if (!event) {
     return (

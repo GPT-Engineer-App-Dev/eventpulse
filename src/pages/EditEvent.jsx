@@ -1,32 +1,36 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Container, FormControl, FormLabel, Input, VStack, Heading } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useEvent, useUpdateEvent } from "../integrations/supabase/index.js";
 
 const EditEvent = () => {
   const { id } = useParams();
+  const { data: event, isLoading } = useEvent(id);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
+  const updateEvent = useUpdateEvent();
 
   useEffect(() => {
-    const events = JSON.parse(localStorage.getItem("events")) || [];
-    const event = events[id];
+    
     if (event) {
       setTitle(event.title);
       setDate(event.date);
       setDescription(event.description);
     }
-  }, [id]);
+  }, [event]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedEvent = { title, date, description };
-    const events = JSON.parse(localStorage.getItem("events")) || [];
-    events[id] = updatedEvent;
-    localStorage.setItem("events", JSON.stringify(events));
+    await updateEvent.mutateAsync(updatedEvent);
     navigate("/");
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Container maxW="container.md" p={4}>

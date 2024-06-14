@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { Box, Button, Container, FormControl, FormLabel, Input, VStack, Heading } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useAddEvent } from "../integrations/supabase/index.js";
 
 const CreateEvent = () => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
+  const addEvent = useAddEvent();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newEvent = { title, date, description };
-    // Save the new event to local storage or backend
-    const events = JSON.parse(localStorage.getItem("events")) || [];
-    events.push(newEvent);
-    localStorage.setItem("events", JSON.stringify(events));
+    await addEvent.mutateAsync(newEvent);
     navigate("/");
   };
 
