@@ -1,20 +1,18 @@
 import { Box, Container, Heading, VStack, Text, HStack, Spacer, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEvents, useDeleteEvent } from "../integrations/supabase/index.js";
 
 const Index = () => {
-  const [events, setEvents] = useState([]);
+  const { data: events, isLoading } = useEvents();
+  const deleteEvent = useDeleteEvent();
 
-  useEffect(() => {
-    const events = JSON.parse(localStorage.getItem("events")) || [];
-    setEvents(events);
-  }, []);
-
-  const handleDelete = (index) => {
-    const updatedEvents = events.filter((_, i) => i !== index);
-    localStorage.setItem("events", JSON.stringify(updatedEvents));
-    setEvents(updatedEvents);
+  const handleDelete = async (id) => {
+    await deleteEvent.mutateAsync(id);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Container maxW="container.xl" p={4}>
@@ -35,16 +33,16 @@ const Index = () => {
             <Text>No events available. Please check back later.</Text>
           </Box>
         ) : (
-          events.map((event, index) => (
-            <Box as={Link} to={`/event/${index}`} key={index} w="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
-            <Heading as="h3" size="sm">{event.title}</Heading>
-            <Text>{event.date}</Text>
-            <Text>{event.description}</Text>
-            <HStack mt={4}>
-              <Button as={Link} to={`/edit/${index}`} colorScheme="teal" variant="outline" onClick={(e) => e.stopPropagation()}>Edit</Button>
-              <Button colorScheme="red" variant="outline" onClick={(e) => { e.stopPropagation(); handleDelete(index); }}>Delete</Button>
-            </HStack>
-          </Box>
+          events.map((event) => (
+            <Box as={Link} to={`/event/${event.id}`} key={event.id} w="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
+              <Heading as="h3" size="sm">{event.title}</Heading>
+              <Text>{event.date}</Text>
+              <Text>{event.description}</Text>
+              <HStack mt={4}>
+                <Button as={Link} to={`/edit/${event.id}`} colorScheme="teal" variant="outline" onClick={(e) => e.stopPropagation()}>Edit</Button>
+                <Button colorScheme="red" variant="outline" onClick={(e) => { e.stopPropagation(); handleDelete(event.id); }}>Delete</Button>
+              </HStack>
+            </Box>
           ))
         )}
       </VStack>
