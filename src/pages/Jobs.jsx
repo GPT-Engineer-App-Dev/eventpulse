@@ -29,7 +29,9 @@ const Jobs = () => {
           ) : (
             <Button as={Link} to="/login" colorScheme="teal" variant="outline">Login</Button>
           )}
-          <Button as={Link} to="/create-job" colorScheme="teal" variant="outline">Create Job</Button>
+          {session && (
+            <Button as={Link} to="/create-job" colorScheme="teal" variant="outline">Create Job</Button>
+          )}
         </HStack>
       </Box>
 
@@ -45,10 +47,12 @@ const Jobs = () => {
             <Box as={Link} to={`/job/${job.id}`} key={job.id} w="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
               <Heading as="h3" size="sm">{job.title}</Heading>
               <Text>{job.description}</Text>
-              <HStack mt={4}>
-                <Button as={Link} to={`/edit-job/${job.id}`} colorScheme="teal" variant="outline" onClick={(e) => e.stopPropagation()}>Edit</Button>
-                <Button colorScheme="red" variant="outline" onClick={(e) => { e.stopPropagation(); handleDelete(job.id); }}>Delete</Button>
-              </HStack>
+              {session && (
+                <HStack mt={4}>
+                  <Button as={Link} to={`/edit-job/${job.id}`} colorScheme="teal" variant="outline" onClick={(e) => e.stopPropagation()}>Edit</Button>
+                  <Button colorScheme="red" variant="outline" onClick={(e) => { e.stopPropagation(); handleDelete(job.id); }}>Delete</Button>
+                </HStack>
+              )}
             </Box>
           ))
         )}
