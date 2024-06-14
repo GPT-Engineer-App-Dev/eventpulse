@@ -36,15 +36,15 @@ const Index = () => {
           </Box>
         ) : (
           events.map((event, index) => (
-            <Box key={index} w="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
-              <Heading as="h3" size="sm">{event.title}</Heading>
-              <Text>{event.date}</Text>
-              <Text>{event.description}</Text>
-              <HStack mt={4}>
-                <Button as={Link} to={`/edit/${index}`} colorScheme="teal" variant="outline">Edit</Button>
-                <Button colorScheme="red" variant="outline" onClick={() => handleDelete(index)}>Delete</Button>
-              </HStack>
-            </Box>
+            <Box as={Link} to={`/event/${index}`} key={index} w="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="md">
+            <Heading as="h3" size="sm">{event.title}</Heading>
+            <Text>{event.date}</Text>
+            <Text>{event.description}</Text>
+            <HStack mt={4}>
+              <Button as={Link} to={`/edit/${index}`} colorScheme="teal" variant="outline" onClick={(e) => e.stopPropagation()}>Edit</Button>
+              <Button colorScheme="red" variant="outline" onClick={(e) => { e.stopPropagation(); handleDelete(index); }}>Delete</Button>
+            </HStack>
+          </Box>
           ))
         )}
       </VStack>
