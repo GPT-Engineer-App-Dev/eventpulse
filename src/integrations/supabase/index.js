@@ -19,6 +19,13 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
+Events // table: events
+    id: number
+    created_at: string
+    title: string
+    date: string
+    description: string
+
 Jobs // table: jobs
     id: number
     created_at: string
@@ -26,6 +33,47 @@ Jobs // table: jobs
     description: string
 
 */
+
+// Hooks for Events table
+export const useEvents = () => useQuery({
+    queryKey: ['events'],
+    queryFn: () => fromSupabase(supabase.from('events').select('*')),
+});
+
+export const useEvent = (id) => useQuery({
+    queryKey: ['events', id],
+    queryFn: () => fromSupabase(supabase.from('events').select('*').eq('id', id).single()),
+});
+
+export const useAddEvent = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newEvent) => fromSupabase(supabase.from('events').insert([newEvent])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+export const useUpdateEvent = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updatedEvent) => fromSupabase(supabase.from('events').update(updatedEvent).eq('id', updatedEvent.id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+export const useDeleteEvent = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('events').delete().eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
 
 // Hooks for Jobs table
 export const useJobs = () => useQuery({
@@ -61,7 +109,7 @@ export const useUpdateJob = () => {
 export const useDeleteJob = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id) => fromSupabase.from('jobs').delete().eq('id', id),
+        mutationFn: (id) => fromSupabase(supabase.from('jobs').delete().eq('id', id)),
         onSuccess: () => {
             queryClient.invalidateQueries('jobs');
         },
