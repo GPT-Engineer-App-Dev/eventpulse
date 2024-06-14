@@ -1,10 +1,13 @@
 import { Box, Container, Heading, VStack, Text, HStack, Spacer, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useEvents, useDeleteEvent } from "../integrations/supabase/index.js";
+import { useSupabaseAuth } from "../integrations/supabase/auth.jsx";
 
 const Index = () => {
   const { data: events, isLoading } = useEvents();
   const deleteEvent = useDeleteEvent();
+
+  const { session, logout } = useSupabaseAuth();
 
   const handleDelete = async (id) => {
     await deleteEvent.mutateAsync(id);
@@ -21,6 +24,11 @@ const Index = () => {
         <HStack>
           <Heading as="h1" size="lg">Events Management</Heading>
           <Spacer />
+          {session ? (
+            <Button colorScheme="teal" variant="outline" onClick={logout}>Logout</Button>
+          ) : (
+            <Button as={Link} to="/login" colorScheme="teal" variant="outline">Login</Button>
+          )}
           <Button as={Link} to="/create" colorScheme="teal" variant="outline">Create Event</Button>
         </HStack>
       </Box>
